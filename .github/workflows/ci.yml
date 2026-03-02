@@ -27,3 +27,18 @@ jobs:
         run: |
           docker build -t swati9455/gitops-microservice-demo:${{ steps.vars.outputs.SHA_SHORT }} .
           docker push swati9455/gitops-microservice-demo:${{ steps.vars.outputs.SHA_SHORT }}
+
+      - name: Update Manifest Repo
+        run: |
+          git config --global user.name "Swati-830"
+          git config --global user.email "swatijaiswal90090@gmail.com"
+
+          git clone https://Swati-830:${{ secrets.MANIFEST_REPO_TOKEN }}@github.com/Swati-830/gitops-microservice-manifests.git
+
+          cd gitops-microservice-manifests
+
+          sed -i "s|image: swati9455/gitops-microservice-demo:.*|image: swati9455/gitops-microservice-demo:${{ steps.vars.outputs.SHA_SHORT }}|g" deployment.yaml
+
+          git add deployment.yaml
+          git commit -m "Update image to ${{ steps.vars.outputs.SHA_SHORT }}"
+          git push origin main
